@@ -10,8 +10,10 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import jp.co.sample.emp_management.domain.Administrator;
 import jp.co.sample.emp_management.domain.Employee;
 import jp.co.sample.emp_management.form.UpdateEmployeeForm;
+import jp.co.sample.emp_management.service.AdministratorService;
 import jp.co.sample.emp_management.service.EmployeeService;
 
 /**
@@ -26,6 +28,9 @@ public class EmployeeController {
 
 	@Autowired
 	private EmployeeService employeeService;
+	
+	@Autowired
+	private AdministratorService administratorService;
 	
 	/**
 	 * 使用するフォームオブジェクトをリクエストスコープに格納する.
@@ -67,7 +72,10 @@ public class EmployeeController {
 	@RequestMapping("/showDetail")
 	public String showDetail(String id, Model model) {
 		Employee employee = employeeService.showDetail(Integer.parseInt(id));
+		System.out.println(id);
+		Administrator administratorName = administratorService.load(Integer.parseInt(id));
 		model.addAttribute("employee", employee);
+		model.addAttribute("administratorName", administratorName.getName());
 		return "employee/detail";
 	}
 	

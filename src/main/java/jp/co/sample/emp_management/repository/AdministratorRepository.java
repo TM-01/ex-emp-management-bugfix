@@ -79,5 +79,13 @@ public class AdministratorRepository {
 		}
 		return administratorList.get(0);
 	}
+	
+	public Administrator load(int administratorId) {
+		String sql = "SELECT id, name, mail_address, password FROM administrators WHERE id = :administratorId;";
+		SqlParameterSource param = new MapSqlParameterSource().addValue("administratorId", administratorId);
+		Administrator administrator = template.queryForObject(sql, param, ADMINISTRATOR_ROW_MAPPER);
+		
+		return administrator;
+	}
 
 }

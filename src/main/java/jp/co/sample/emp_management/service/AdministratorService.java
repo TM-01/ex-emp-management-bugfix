@@ -39,4 +39,9 @@ public class AdministratorService {
 		Administrator administrator = administratorRepository.findByMailAddressAndPassward(mailAddress, passward);
 		return administrator;
 	}
+	
+	public Administrator load(int administratorId) {
+		Administrator administrator = administratorRepository.load(administratorId);
+		return administrator;
+	}
 }

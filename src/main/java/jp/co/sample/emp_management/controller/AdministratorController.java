@@ -105,6 +105,8 @@ public class AdministratorController {
 			model.addAttribute("errorMessage", "メールアドレスまたはパスワードが不正です。");
 			return toLogin();
 		}
+		model.addAttribute("administratorName", administrator.getName());
+		
 		return "forward:/employee/showList";
 	}
 	
