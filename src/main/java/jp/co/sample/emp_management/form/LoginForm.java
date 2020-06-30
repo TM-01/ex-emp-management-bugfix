@@ -1,5 +1,8 @@
 package jp.co.sample.emp_management.form;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Size;
+
 /**
  * ログイン時に使用するフォーム.
  * 
@@ -8,8 +11,10 @@ package jp.co.sample.emp_management.form;
  */
 public class LoginForm {
 	/** メールアドレス */
+	@Email(message="Eメールの形式が不正です")
 	private String mailAddress;
 	/** パスワード */
+	@Size(min=4, max=12, message="パスワードは4文字以上12文字以下でで入力してください")
 	private String password;
 
 	public String getMailAddress() {
