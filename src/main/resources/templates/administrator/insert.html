@@ -35,6 +35,9 @@
 						<input type="hidden" name="token" th:value="${session.token}">
 						<fieldset>
 							<legend>管理者登録<br>(システムにログインできる管理者を登録します)</legend>
+							<div th:if="${session.confirm!=null}">
+								<span>メールアドレスと確認用アドレスが違います</span>
+							</div>
 							<!-- 氏名 -->
 							<div class="form-group">
 								<div class="row">
@@ -78,6 +81,18 @@
 										</label>
 										<input type="password" name="password" id="password" class="form-control" placeholder="password"
 											 th:field="*{password}" th:errorclass="error-input" value="xxxxxxxx">
+									</div>
+								</div>
+							</div>
+							<!-- 確認用パスワード -->
+							<div class="form-group">
+								<div class="row">
+									<div class="col-sm-12">
+										<label for="confirmPassword">
+											確認用パスワード:
+										</label>
+										<input type="password" name="confirmPassword" id="confirmPassword" class="form-control" placeholder="confirmPassword"
+											 th:field="*{confirmPassword}" value="xxxxxxxx">
 									</div>
 								</div>
 							</div>

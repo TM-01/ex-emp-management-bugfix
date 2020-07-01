@@ -64,7 +64,7 @@ public class AdministratorController {
 	@RequestMapping("/toInsert")
 	public String toInsert(Model model) {
 		session.setAttribute("token", getCsrfToken());
-		System.out.println(model.getAttribute("token"));
+		session.setAttribute("confirm", null);
 		return "administrator/insert";
 	}
 
@@ -81,14 +81,18 @@ public class AdministratorController {
 			RedirectAttributes redirectAttributes,
 			Model model,
 			String token) {
+		//登録後の更新における二重登録阻止
 		if(!(session.getAttribute("token").equals(token))) {
 			System.out.println("トークンが違うよ");
 			return "administrator/login";
 		}
-		session.setAttribute("token", "未使用");
 		//バリデーションがエラーを拾ったときページに再遷移
 		if(result.hasErrors()) {
 			model.addAttribute("inputForm", form);
+			return "administrator/insert";
+		}
+		if(!(form.getPassword().equals(form.getConfirmPassword()))) {
+			session.setAttribute("confirm", true);
 			return "administrator/insert";
 		}
 		Administrator administrator = new Administrator();
@@ -96,6 +100,7 @@ public class AdministratorController {
 		BeanUtils.copyProperties(form, administrator);
 		try {
 			administratorService.insert(administrator);
+			session.setAttribute("token", "未使用");
 		}catch(Exception e) {
 			model.addAttribute("judge", 1);
 			System.out.println("既に登録されています");
