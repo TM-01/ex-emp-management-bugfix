@@ -42,7 +42,10 @@
 							<div class="form-group">
 								<div class="row">
 									<div class="col-sm-12">
-										<div th:if="${judge!=null}">既に登録されています</div>
+										<label th:if="${#fields.hasErrors('already')}" th:errors="*{already}" class="error-messages">
+											エラー表示テスト
+										</label>
+										<br>
 										<label for="name">
 											氏名:
 										</label>
@@ -90,6 +93,9 @@
 									<div class="col-sm-12">
 										<label for="confirmPassword">
 											確認用パスワード:
+										</label>
+										<label th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}" class="error-messages">
+											エラー表示テスト
 										</label>
 										<input type="password" name="confirmPassword" id="confirmPassword" class="form-control" placeholder="confirmPassword"
 											 th:field="*{confirmPassword}" value="xxxxxxxx">

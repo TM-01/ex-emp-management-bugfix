@@ -4,12 +4,14 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.constraints.NotBlank;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestAttribute;
@@ -88,24 +90,26 @@ public class AdministratorController {
 		}
 		//バリデーションがエラーを拾ったときページに再遷移
 		if(result.hasErrors()) {
-			model.addAttribute("inputForm", form);
 			return "administrator/insert";
 		}
 		if(!(form.getPassword().equals(form.getConfirmPassword()))) {
-			session.setAttribute("confirm", true);
+			FieldError fieldError = new FieldError(result.getObjectName(), "confirmPassword", "確認用メールアドレスが一致していません");
+			result.addError(fieldError);
 			return "administrator/insert";
 		}
-		Administrator administrator = new Administrator();
+		
+		
+		Administrator administrator = administratorService.login(form.getMailAddress(), form.getPassword());
+		if(!(administrator==null)) {
+			FieldError fieldError = new FieldError(result.getObjectName(), "already", "既に登録されています");
+			result.addError(fieldError);
+			System.out.println("既にあるよ");
+			return "administrator/insert";
+		}
 		// フォームからドメインにプロパティ値をコピー
 		BeanUtils.copyProperties(form, administrator);
-		try {
-			administratorService.insert(administrator);
-			session.setAttribute("token", "未使用");
-		}catch(Exception e) {
-			model.addAttribute("judge", 1);
-			System.out.println("既に登録されています");
-			return "administrator/insert";
-		}
+		administratorService.insert(administrator);
+		
 		return "administrator/login";
 	}
 

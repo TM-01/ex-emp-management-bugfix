@@ -23,6 +23,8 @@ public class InsertAdministratorForm {
 	private String password;
 	/** 確認用パスワード */
 	private String confirmPassword;
+	/** 既に登録済み*/
+	private String already;
 	
 	public String getName() {
 		return name;
@@ -48,10 +50,21 @@ public class InsertAdministratorForm {
 	public void setConfirmPassword(String confirmPassword) {
 		this.confirmPassword = confirmPassword;
 	}
+	public String getAlready() {
+		return already;
+	}
+	public void setAlready(String already) {
+		this.already = already;
+	}
 	@Override
 	public String toString() {
 		return "InsertAdministratorForm [name=" + name + ", mailAddress=" + mailAddress + ", password=" + password
-				+ ", confirmPassword=" + confirmPassword + "]";
+				+ ", confirmPassword=" + confirmPassword + ", already=" + already + ", getName()=" + getName()
+				+ ", getMailAddress()=" + getMailAddress() + ", getPassword()=" + getPassword()
+				+ ", getConfirmPassword()=" + getConfirmPassword() + ", getAlready()=" + getAlready() + ", getClass()="
+				+ getClass() + ", hashCode()=" + hashCode() + ", toString()=" + super.toString() + "]";
 	}
+	
+	
 	
 }
