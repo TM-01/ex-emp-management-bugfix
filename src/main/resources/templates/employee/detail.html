@@ -40,7 +40,7 @@
 						<li class="active"><a href="list.html" th:href="@{/employee/showList}">従業員管理</a></li>
 					</ul>
 					<p class="navbar-text navbar-right">
-					   <span th:text="${administratorName}">山田太郎</span>さんこんにちは！
+					   <span th:text="${session.administratorName}">山田太郎</span>さんこんにちは！
 						&nbsp;&nbsp;&nbsp;
 						<a href="../administrator/login.html" class="navbar-link" th:href="@{/logout}">ログアウト</a>
 					</p>
@@ -141,7 +141,7 @@
 							      給料
 							    </th>
 							    <td>
-							      <span th:utext="${employee.salary + '円'}">400000円</span>
+							      <span th:utext="${#numbers.formatInteger(employee.salary, 3, 'COMMA') + '円'}">400000円</span>
 							    </td>
 							  </tr>
 							  <tr>

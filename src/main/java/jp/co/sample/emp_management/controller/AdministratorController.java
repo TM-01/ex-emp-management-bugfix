@@ -137,7 +137,6 @@ public class AdministratorController {
 			RedirectAttributes redirectAttributes,
 			Model model) {
 		if(result.hasErrors()) {
-			model.addAttribute("inputForm", form);
 			return toLogin();
 		}
 		Administrator administrator = administratorService.login(form.getMailAddress(), form.getPassword());
@@ -145,7 +144,7 @@ public class AdministratorController {
 			model.addAttribute("errorMessage", "メールアドレスまたはパスワードが不正です。");
 			return toLogin();
 		}
-		model.addAttribute("administratorName", administrator.getName());
+		session.setAttribute("administratorName", administrator.getName());
 		
 		return "forward:/employee/showList";
 	}
