@@ -32,12 +32,14 @@
 <!-- ここにモックのform要素を貼り付けます -->
 
 					<form method="post" action="login.html" th:action="@{/insert}" th:object="${insertAdministratorForm}">
+						<input type="hidden" name="token" th:value="${session.token}">
 						<fieldset>
 							<legend>管理者登録<br>(システムにログインできる管理者を登録します)</legend>
 							<!-- 氏名 -->
 							<div class="form-group">
 								<div class="row">
 									<div class="col-sm-12">
+										<div th:if="${judge!=null}">既に登録されています</div>
 										<label for="name">
 											氏名:
 										</label>
@@ -83,7 +85,7 @@
 							<div class="form-group">
 								<div class="row">
 									<div class="col-sm-12">
-										<button type="submit" class="btn btn-primary">登録</button>
+										<button type="submit" class="btn btn-primary" id="insert_btn">登録</button>
 									</div>
 								</div>
 							</div>
@@ -101,5 +103,6 @@
 	<script
 		src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 	<script src="../../static/js/bootstrap.min.js"></script>
+	<script th:src="@{/js/insert.js}"></script>
 </body>
 </html>

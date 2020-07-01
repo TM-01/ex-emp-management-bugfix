@@ -1,5 +1,8 @@
 package jp.co.sample.emp_management.controller;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.BeanUtils;
@@ -59,7 +62,9 @@ public class AdministratorController {
 	 * @return 管理者登録画面
 	 */
 	@RequestMapping("/toInsert")
-	public String toInsert() {
+	public String toInsert(Model model) {
+		session.setAttribute("token", getCsrfToken());
+		System.out.println(model.getAttribute("token"));
 		return "administrator/insert";
 	}
 
@@ -71,11 +76,31 @@ public class AdministratorController {
 	 * @return ログイン画面へリダイレクト
 	 */
 	@RequestMapping("/insert")
-	public String insert(InsertAdministratorForm form) {
+	public String insert(@Validated InsertAdministratorForm form,
+			BindingResult result,
+			RedirectAttributes redirectAttributes,
+			Model model,
+			String token) {
+		if(!(session.getAttribute("token").equals(token))) {
+			System.out.println("トークンが違うよ");
+			return "administrator/login";
+		}
+		session.setAttribute("token", "未使用");
+		//バリデーションがエラーを拾ったときページに再遷移
+		if(result.hasErrors()) {
+			model.addAttribute("inputForm", form);
+			return "administrator/insert";
+		}
 		Administrator administrator = new Administrator();
 		// フォームからドメインにプロパティ値をコピー
 		BeanUtils.copyProperties(form, administrator);
-		administratorService.insert(administrator);
+		try {
+			administratorService.insert(administrator);
+		}catch(Exception e) {
+			model.addAttribute("judge", 1);
+			System.out.println("既に登録されています");
+			return "administrator/insert";
+		}
 		return "administrator/login";
 	}
 
@@ -133,5 +158,29 @@ public class AdministratorController {
 		session.invalidate();
 		return "redirect:/";
 	}
+	
+	/**
+	 * トークンの生成.
+	 * @return toStringでトークンを返す
+	 */
+	public static String getCsrfToken() {
+	    byte token[] = new byte[16];
+	    StringBuffer buf = new StringBuffer();
+	    SecureRandom random = null;
+	 
+	    try {
+	      random = SecureRandom.getInstance("SHA1PRNG");
+	      random.nextBytes(token);
+	 
+	      for (int i = 0; i < token.length; i++) {
+	        buf.append(String.format("%02x", token[i]));
+	      }
+	 
+	    } catch (NoSuchAlgorithmException e) {
+	      e.printStackTrace();
+	    }
+	 
+	    return buf.toString();
+	  }
 	
 }
