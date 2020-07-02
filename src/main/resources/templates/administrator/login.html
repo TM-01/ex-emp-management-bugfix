@@ -37,9 +37,9 @@
 								<div class="alert alert-danger" th:if="${errorMessage}">
 			                        <p th:text="${errorMessage}">メールアドレスまたはパスワードが間違っています</p>
 			                    </div>
-			                    <label th:if="${#fields.hasErrors('errorMessage')}" th:errors="*{errorMessage}" class="error-messages">
+			                    <div th:if="${#fields.hasErrors('errorMessage')}" th:errors="*{errorMessage}" class="error-messages">
 									エラー表示テスト
-								</label>
+								</div>
 							</div>
 							<div class="form-group">
 								<span th:errors="*{mailAddress}" style="color:red">うんこ</span><br>

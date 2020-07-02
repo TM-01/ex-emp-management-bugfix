@@ -141,7 +141,6 @@ public class AdministratorController {
 			return toLogin();
 		}
 		BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
-//		Administrator administrator = administratorService.login(form.getMailAddress(), hashPassword);
 		List<Administrator> administratorList = administratorService.findAll(form.getMailAddress());
 		if(administratorList.size()==0) {
 			FieldError fieldError = new FieldError(result.getObjectName(), "errorMessage", "メールアドレスまたはパスワードが不正です");
@@ -154,12 +153,6 @@ public class AdministratorController {
 				return "forward:/employee/showList";
 			}
 		}
-//		if (administrator == null) {
-//			model.addAttribute("errorMessage", "メールアドレスまたはパスワードが不正です。");
-//			return toLogin();
-//		}
-//		session.setAttribute("administratorName", administrator.getName());
-
 		return toLogin();
 	}
 
