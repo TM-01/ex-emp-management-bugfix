@@ -35,7 +35,7 @@ public class AdministratorController {
 
 	@Autowired
 	private AdministratorService administratorService;
-	
+
 	@Autowired
 	private HttpSession session;
 
@@ -48,8 +48,8 @@ public class AdministratorController {
 	public InsertAdministratorForm setUpInsertAdministratorForm() {
 		return new InsertAdministratorForm();
 	}
-	
-	//  (SpringSecurityに任せるためコメントアウトしました)
+
+	// (SpringSecurityに任せるためコメントアウトしました)
 	@ModelAttribute
 	public LoginForm setUpLoginForm() {
 		return new LoginForm();
@@ -73,43 +73,36 @@ public class AdministratorController {
 	/**
 	 * 管理者情報を登録します.
 	 * 
-	 * @param form
-	 *            管理者情報用フォーム
+	 * @param form 管理者情報用フォーム
 	 * @return ログイン画面へリダイレクト
 	 */
 	@RequestMapping("/insert")
-	public String insert(@Validated InsertAdministratorForm form,
-			BindingResult result,
-			RedirectAttributes redirectAttributes,
-			Model model,
-			String token) {
-		//登録後の更新における二重登録阻止
-		if(!(session.getAttribute("token").equals(token))) {
+	public String insert(@Validated InsertAdministratorForm form, BindingResult result,
+			RedirectAttributes redirectAttributes, Model model, String token) {
+		// 登録後の更新における二重登録阻止
+		if (!(session.getAttribute("token").equals(token))) {
 			System.out.println("トークンが違うよ");
 			return "administrator/login";
 		}
-		//バリデーションがエラーを拾ったときページに再遷移
-		if(result.hasErrors()) {
-			return "administrator/insert";
-		}
-		if(!(form.getPassword().equals(form.getConfirmPassword()))) {
+		// 確認用メールアドレスのチェック
+		if (!(form.getPassword().equals(form.getConfirmPassword()))) {
 			FieldError fieldError = new FieldError(result.getObjectName(), "confirmPassword", "確認用メールアドレスが一致していません");
 			result.addError(fieldError);
-			return "administrator/insert";
 		}
-		
-		
-		Administrator administrator = administratorService.login(form.getMailAddress(), form.getPassword());
-		if(!(administrator==null)) {
-			FieldError fieldError = new FieldError(result.getObjectName(), "already", "既に登録されています");
+		// メールアドレスの重複チェック
+		Administrator administrator = administratorService.findByMailAddress(form.getMailAddress());
+		if (!(administrator == null)) {
+			FieldError fieldError = new FieldError(result.getObjectName(), "already", "既に登録されているメールアドレスです");
 			result.addError(fieldError);
-			System.out.println("既にあるよ");
+		}
+		// バリデーションがエラーを拾ったときページに再遷移
+		if (result.hasErrors()) {
 			return "administrator/insert";
 		}
 		// フォームからドメインにプロパティ値をコピー
 		BeanUtils.copyProperties(form, administrator);
 		administratorService.insert(administrator);
-		
+
 		return "administrator/login";
 	}
 
@@ -129,18 +122,14 @@ public class AdministratorController {
 	/**
 	 * ログインします.
 	 * 
-	 * @param form
-	 *            管理者情報用フォーム
-	 * @param result1
-	 *            エラー情報格納用オブッジェクト
+	 * @param form    管理者情報用フォーム
+	 * @param result1 エラー情報格納用オブッジェクト
 	 * @return ログイン後の従業員一覧画面
 	 */
 	@RequestMapping("/login")
-	public String login(@Validated LoginForm form,
-			BindingResult result,
-			RedirectAttributes redirectAttributes,
+	public String login(@Validated LoginForm form, BindingResult result, RedirectAttributes redirectAttributes,
 			Model model) {
-		if(result.hasErrors()) {
+		if (result.hasErrors()) {
 			return toLogin();
 		}
 		Administrator administrator = administratorService.login(form.getMailAddress(), form.getPassword());
@@ -149,10 +138,10 @@ public class AdministratorController {
 			return toLogin();
 		}
 		session.setAttribute("administratorName", administrator.getName());
-		
+
 		return "forward:/employee/showList";
 	}
-	
+
 	/////////////////////////////////////////////////////
 	// ユースケース：ログアウトをする
 	/////////////////////////////////////////////////////
@@ -166,29 +155,30 @@ public class AdministratorController {
 		session.invalidate();
 		return "redirect:/";
 	}
-	
+
 	/**
 	 * トークンの生成.
+	 * 
 	 * @return toStringでトークンを返す
 	 */
 	public static String getCsrfToken() {
-	    byte token[] = new byte[16];
-	    StringBuffer buf = new StringBuffer();
-	    SecureRandom random = null;
-	 
-	    try {
-	      random = SecureRandom.getInstance("SHA1PRNG");
-	      random.nextBytes(token);
-	 
-	      for (int i = 0; i < token.length; i++) {
-	        buf.append(String.format("%02x", token[i]));
-	      }
-	 
-	    } catch (NoSuchAlgorithmException e) {
-	      e.printStackTrace();
-	    }
-	 
-	    return buf.toString();
-	  }
-	
+		byte token[] = new byte[16];
+		StringBuffer buf = new StringBuffer();
+		SecureRandom random = null;
+
+		try {
+			random = SecureRandom.getInstance("SHA1PRNG");
+			random.nextBytes(token);
+
+			for (int i = 0; i < token.length; i++) {
+				buf.append(String.format("%02x", token[i]));
+			}
+
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+
+		return buf.toString();
+	}
+
 }
