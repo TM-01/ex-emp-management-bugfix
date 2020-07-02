@@ -35,9 +35,6 @@
 						<input type="hidden" name="token" th:value="${session.token}">
 						<fieldset>
 							<legend>管理者登録<br>(システムにログインできる管理者を登録します)</legend>
-							<div th:if="${session.confirm!=null}">
-								<span>メールアドレスと確認用アドレスが違います</span>
-							</div>
 							<!-- 氏名 -->
 							<div class="form-group">
 								<div class="row">

@@ -98,4 +98,14 @@ public class EmployeeController {
 		employeeService.update(employee);
 		return "redirect:/employee/showList";
 	}
+	
+	@RequestMapping("/search")
+	public String search(String search,Model model) {
+		System.out.println(search);
+		List<Employee> ambiguousList = employeeService.findName(search);
+		System.out.println(ambiguousList.toString());
+		model.addAttribute("employeeList", ambiguousList);
+		
+		return "employee/list";
+	}
 }
