@@ -29,9 +29,6 @@ public class EmployeeController {
 	@Autowired
 	private EmployeeService employeeService;
 	
-	@Autowired
-	private AdministratorService administratorService;
-	
 	/**
 	 * 使用するフォームオブジェクトをリクエストスコープに格納する.
 	 * 
@@ -99,11 +96,20 @@ public class EmployeeController {
 		return "redirect:/employee/showList";
 	}
 	
+	/**
+	 * 曖昧検索.
+	 * @param search
+	 * @param model
+	 * @return
+	 */
 	@RequestMapping("/search")
 	public String search(String search,Model model) {
-		System.out.println(search);
-		List<Employee> ambiguousList = employeeService.findName(search);
+		List<Employee> ambiguousList = employeeService.findByName(search);
 		System.out.println(ambiguousList.toString());
+		if(ambiguousList.size()==0) {
+			model.addAttribute("notFind", true);
+			ambiguousList = employeeService.findByName("");
+		}
 		model.addAttribute("employeeList", ambiguousList);
 		
 		return "employee/list";

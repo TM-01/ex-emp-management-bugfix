@@ -60,7 +60,7 @@ public class EmployeeService {
 	 * @param nameParts 検索する文字
 	 * @return 従業員一覧ページへ表示
 	 */
-	public List<Employee> findName(String nameParts) {
-		return employeeRepository.findName(nameParts);
+	public List<Employee> findByName(String nameParts) {
+		return employeeRepository.findByName(nameParts);
 	}
 }

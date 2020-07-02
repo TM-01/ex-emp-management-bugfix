@@ -65,6 +65,7 @@
 					<input type="text" name="search">
 					<button>従業員名検索</button>
 				</form>
+				<div th:if="${notFind}"><br>一件もありませんでした</div>
 <!-- ここにモックのtable要素を貼り付けます -->
 
 				<table class="table table-striped">

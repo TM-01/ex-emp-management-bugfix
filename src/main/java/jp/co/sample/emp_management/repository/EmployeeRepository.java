@@ -87,7 +87,7 @@ public class EmployeeRepository {
 	 * @param nameParts 検索する文字
 	 * @return 従業員一覧ページへ表示
 	 */
-	public List<Employee> findName(String nameParts) {
+	public List<Employee> findByName(String nameParts) {
 		String sql = "SELECT id,name,image,gender,hire_date,mail_address,zip_code,address,telephone,salary,characteristics,dependents_count FROM employees WHERE name LIKE :nameParts ORDER BY hire_date;";
 		
 		SqlParameterSource param = new MapSqlParameterSource().addValue("nameParts", "%"+nameParts+"%");
