@@ -3,8 +3,6 @@ package jp.co.sample.emp_management.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,5 +55,14 @@ public class AdministratorService {
 	 */
 	public Administrator findByMailAddress(String mailAddress) {
 		return administratorRepository.findByMailAddress(mailAddress);
+	}
+	
+	/**
+	 * メールアドレスが一致するものをすべて検索.
+	 * @param mailAddress
+	 * @return リストですべて返す
+	 */
+	public List<Administrator> findAll(String mailAddress) {
+		return administratorRepository.findAll(mailAddress);
 	}
 }

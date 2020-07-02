@@ -2,19 +2,19 @@ package jp.co.sample.emp_management.controller;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.List;
 
 import javax.servlet.http.HttpSession;
-import javax.validation.constraints.NotBlank;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -65,8 +65,9 @@ public class AdministratorController {
 	 */
 	@RequestMapping("/toInsert")
 	public String toInsert(Model model) {
+		// ワンタイムトークンの生成
 		session.setAttribute("token", getCsrfToken());
-		session.setAttribute("confirm", null);
+
 		return "administrator/insert";
 	}
 
@@ -90,8 +91,8 @@ public class AdministratorController {
 			result.addError(fieldError);
 		}
 		// メールアドレスの重複チェック
-		Administrator administrator = administratorService.findByMailAddress(form.getMailAddress());
-		if (!(administrator == null)) {
+		Administrator administratorCheck = administratorService.findByMailAddress(form.getMailAddress());
+		if (!(administratorCheck == null)) {
 			FieldError fieldError = new FieldError(result.getObjectName(), "already", "既に登録されているメールアドレスです");
 			result.addError(fieldError);
 		}
@@ -100,8 +101,15 @@ public class AdministratorController {
 			return "administrator/insert";
 		}
 		// フォームからドメインにプロパティ値をコピー
+		BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
+		String hashPassword = bcrypt.encode(form.getPassword());
+		Administrator administrator = new Administrator();
 		BeanUtils.copyProperties(form, administrator);
+		administrator.setPassword(hashPassword);
 		administratorService.insert(administrator);
+		// トークンの破棄
+		session.setAttribute("token", "ここで破棄");
+		System.out.println(hashPassword);
 
 		return "administrator/login";
 	}
@@ -132,14 +140,27 @@ public class AdministratorController {
 		if (result.hasErrors()) {
 			return toLogin();
 		}
-		Administrator administrator = administratorService.login(form.getMailAddress(), form.getPassword());
-		if (administrator == null) {
-			model.addAttribute("errorMessage", "メールアドレスまたはパスワードが不正です。");
-			return toLogin();
+		BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
+//		Administrator administrator = administratorService.login(form.getMailAddress(), hashPassword);
+		List<Administrator> administratorList = administratorService.findAll(form.getMailAddress());
+		if(administratorList.size()==0) {
+			FieldError fieldError = new FieldError(result.getObjectName(), "errorMessage", "メールアドレスまたはパスワードが不正です");
+			result.addError(fieldError);
+			return "administrator/login";
 		}
-		session.setAttribute("administratorName", administrator.getName());
+		for(Administrator checkPass:administratorList) {
+			if(bcrypt.matches(form.getPassword(), checkPass.getPassword())) {
+				session.setAttribute("administratorName", checkPass.getName());
+				return "forward:/employee/showList";
+			}
+		}
+//		if (administrator == null) {
+//			model.addAttribute("errorMessage", "メールアドレスまたはパスワードが不正です。");
+//			return toLogin();
+//		}
+//		session.setAttribute("administratorName", administrator.getName());
 
-		return "forward:/employee/showList";
+		return toLogin();
 	}
 
 	/////////////////////////////////////////////////////

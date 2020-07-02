@@ -16,26 +16,33 @@ public class LoginForm {
 	/** パスワード */
 	@Size(min=4, max=12, message="パスワードは4文字以上12文字以下でで入力してください")
 	private String password;
-
+	private String errorMessage;
 	public String getMailAddress() {
 		return mailAddress;
 	}
-
 	public void setMailAddress(String mailAddress) {
 		this.mailAddress = mailAddress;
 	}
-
 	public String getPassword() {
 		return password;
 	}
-
 	public void setPassword(String password) {
 		this.password = password;
 	}
-
+	public String getErrorMessage() {
+		return errorMessage;
+	}
+	public void setErrorMessage(String errorMessage) {
+		this.errorMessage = errorMessage;
+	}
 	@Override
 	public String toString() {
-		return "LoginForm [mailAddress=" + mailAddress + ", password=" + password + "]";
+		return "LoginForm [mailAddress=" + mailAddress + ", password=" + password + ", errorMessage=" + errorMessage
+				+ "]";
 	}
+	
+	
+
+	
 
 }

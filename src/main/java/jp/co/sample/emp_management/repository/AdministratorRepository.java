@@ -88,5 +88,22 @@ public class AdministratorRepository {
 		
 		return administrator;
 	}
+	
+	/**
+	 * メールアドレスが一致するものをすべて検索.
+	 * @param mailAddress
+	 * @return リストですべて返す
+	 */
+	public List<Administrator> findAll(String mailAddress) {
+		String sql = "select id,name,mail_address,password from administrators where mail_address=:mailAddress";
+		SqlParameterSource param = new MapSqlParameterSource().addValue("mailAddress", mailAddress);
+		List<Administrator> administratorList = template.query(sql, param, ADMINISTRATOR_ROW_MAPPER);
+		if (administratorList.size() == 0) {
+			return null;
+		}
+		return administratorList;
+	}
+	
+	
 
 }
