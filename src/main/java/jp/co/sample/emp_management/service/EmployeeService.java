@@ -1,12 +1,12 @@
 package jp.co.sample.emp_management.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
 
 import jp.co.sample.emp_management.domain.Employee;
 import jp.co.sample.emp_management.repository.EmployeeRepository;
@@ -62,5 +62,41 @@ public class EmployeeService {
 	 */
 	public List<Employee> findByName(String nameParts) {
 		return employeeRepository.findByName(nameParts);
+	}
+	/**
+	 * ページング処理.
+	 * @param EmployeeList DBから検索された従業員一覧情報
+	 * @param change 次のページの遷移先
+	 * @param model ページの最小/最大、表示
+	 */
+	public void pageing(List<Employee> EmployeeList, String change, Model model) {
+		int page = 1;
+		int minPage = 1;
+		int maxPage = 1;
+		List<Employee> employeeListPart = new ArrayList<Employee>();
+		List<Integer> pageCount = new ArrayList<>();
+		
+		if(change!=null) {
+			page = Integer.parseInt(change);
+		}
+		if(EmployeeList.size()%10==0) {
+			maxPage = EmployeeList.size()/10;
+		}else {
+			maxPage = (int)(EmployeeList.size()/10)+1;
+		}
+		
+		for(int i=(page*10)-9;(i<=page*10)&&(i<=EmployeeList.size());i++) {
+			employeeListPart.add(EmployeeList.get(i-1));
+		}
+		for(int i=1;i<=maxPage;i++) {
+			pageCount.add(i);
+		}
+		
+		model.addAttribute("pageNum", page);
+		model.addAttribute("minPage", minPage);
+		model.addAttribute("maxPage", maxPage);
+		model.addAttribute("pageCount", pageCount);
+		
+		model.addAttribute("employeeList", employeeListPart);
 	}
 }

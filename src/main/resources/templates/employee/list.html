@@ -69,6 +69,7 @@
 				<!-- ここから上を編集する必要はありません -->
 				<form th:action="@{/employee/search}" method="post">
 					<input type="text" name="search" id="search">
+					<input type="hidden" name="useSearch" value="use">
 					<button>従業員名検索</button>
 				</form>
 				<div th:if="${notFind}">
@@ -98,8 +99,45 @@
 						</tr>
 					</tbody>
 				</table>
-
-
+				<table>
+					<tr>
+						<td>
+							<div th:if="${minPage<pageNum}">
+								<span th:if="${session.useSearch}">
+									<a href="detail.html" th:href="@{/employee/search(change=${pageNum-1},search=${session.searchWord},useSearch=${session.useSearch})}">前</a>
+								</span>
+								<span th:unless="${session.useSearch}">
+									<a href="detail.html" th:href="@{'/employee/showList?change=' + ${pageNum-1}}">前</a>
+								</span>
+							</div>
+						</td>
+						<div th:each="page:${pageCount}">
+						<td>
+							<span th:if="${session.useSearch}">
+								<a href="detail.html" th:href="@{/employee/search(change=${page},search=${session.searchWord},useSearch=${session.useSearch})}">
+									<span th:text="${page}"></span>
+								</a>
+							</span>
+							<span th:unless="${session.useSearch}">
+								<a href="detail.html" th:href="@{'/employee/showList?change=' + ${page}}">
+									<span th:text="${page}"></span>
+								</a>
+							</span>
+						</td>
+						</div>
+						<td>
+							<div th:if="${maxPage>pageNum}">
+								<span th:if="${session.useSearch}">
+									<a href="detail.html" th:href="@{/employee/search(change=${pageNum+1},search=${session.searchWord},useSearch=${session.useSearch})}">次</a>
+								</span>
+								<span th:unless="${session.useSearch}">
+									<a href="detail.html" th:href="@{'/employee/showList?change=' + ${pageNum+1}}">次</a>
+								</span>
+							</div>
+						</td>
+					</tr>
+				
+				</table>
 				<!-- ここから下を編集する必要はありません -->
 
 			</div>

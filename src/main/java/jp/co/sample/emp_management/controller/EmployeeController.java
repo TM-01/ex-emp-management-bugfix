@@ -2,6 +2,8 @@ package jp.co.sample.emp_management.controller;
 
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,6 +29,9 @@ public class EmployeeController {
 	@Autowired
 	private EmployeeService employeeService;
 	
+	@Autowired
+	private HttpSession session;
+	
 	/**
 	 * 使用するフォームオブジェクトをリクエストスコープに格納する.
 	 * 
@@ -47,9 +52,11 @@ public class EmployeeController {
 	 * @return 従業員一覧画面
 	 */
 	@RequestMapping("/showList")
-	public String showList(Model model) {
+	public String showList(String change,Model model) {
 		List<Employee> employeeList = employeeService.showList();
-		model.addAttribute("employeeList", employeeList);
+		employeeService.pageing(employeeList,change,model);
+		session.setAttribute("useSearch", null);
+		
 		return "employee/list";
 	}
 
@@ -69,6 +76,7 @@ public class EmployeeController {
 		Employee employee = employeeService.showDetail(Integer.parseInt(id));
 		System.out.println(id);
 		model.addAttribute("employee", employee);
+
 		return "employee/detail";
 	}
 	
@@ -101,13 +109,15 @@ public class EmployeeController {
 	 * @return
 	 */
 	@RequestMapping("/search")
-	public String search(String search,Model model) {
+	public String search(String search,Model model,String change,String useSearch) {
 		List<Employee> ambiguousList = employeeService.findByName(search);
 		if(ambiguousList.size()==0) {
 			model.addAttribute("notFind", true);
 			ambiguousList = employeeService.findByName("");
 		}
-		model.addAttribute("employeeList", ambiguousList);
+		employeeService.pageing(ambiguousList,change,model);
+		session.setAttribute("searchWord", search);
+		session.setAttribute("useSearch", useSearch);
 		
 		return "employee/list";
 	}
