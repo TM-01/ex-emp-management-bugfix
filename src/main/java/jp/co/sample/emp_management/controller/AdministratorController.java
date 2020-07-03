@@ -2,13 +2,11 @@ package jp.co.sample.emp_management.controller;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -38,6 +36,9 @@ public class AdministratorController {
 
 	@Autowired
 	private HttpSession session;
+
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
 	/**
 	 * 使用するフォームオブジェクトをリクエストスコープに格納する.
@@ -100,16 +101,10 @@ public class AdministratorController {
 		if (result.hasErrors()) {
 			return "administrator/insert";
 		}
-		// フォームからドメインにプロパティ値をコピー
-		BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
-		String hashPassword = bcrypt.encode(form.getPassword());
-		Administrator administrator = new Administrator();
-		BeanUtils.copyProperties(form, administrator);
-		administrator.setPassword(hashPassword);
-		administratorService.insert(administrator);
+		// フォームからドメインにHash化したプロパティ値をコピー
+		administratorService.passwordHash(form);
 		// トークンの破棄
 		session.setAttribute("token", "ここで破棄");
-		System.out.println(hashPassword);
 
 		return "administrator/login";
 	}
@@ -140,19 +135,17 @@ public class AdministratorController {
 		if (result.hasErrors()) {
 			return toLogin();
 		}
-		BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
-		List<Administrator> administratorList = administratorService.findAll(form.getMailAddress());
-		if(administratorList.size()==0) {
+		Administrator administrator = administratorService.findByMailAddress(form.getMailAddress());
+		if (administrator == null) {
 			FieldError fieldError = new FieldError(result.getObjectName(), "errorMessage", "メールアドレスまたはパスワードが不正です");
 			result.addError(fieldError);
 			return "administrator/login";
 		}
-		for(Administrator checkPass:administratorList) {
-			if(bcrypt.matches(form.getPassword(), checkPass.getPassword())) {
-				session.setAttribute("administratorName", checkPass.getName());
-				return "forward:/employee/showList";
-			}
+		if (passwordEncoder.matches(form.getPassword(), administrator.getPassword())) {
+			session.setAttribute("administratorName", administrator.getName());
+			return "forward:/employee/showList";
 		}
+		
 		return toLogin();
 	}
 

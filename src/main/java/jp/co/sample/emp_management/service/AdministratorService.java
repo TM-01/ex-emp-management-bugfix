@@ -1,12 +1,14 @@
 package jp.co.sample.emp_management.service;
 
-import java.util.List;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jp.co.sample.emp_management.domain.Administrator;
+import jp.co.sample.emp_management.form.InsertAdministratorForm;
 import jp.co.sample.emp_management.repository.AdministratorRepository;
 
 /**
@@ -21,6 +23,9 @@ public class AdministratorService {
 	
 	@Autowired
 	private AdministratorRepository administratorRepository;
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
 	/**
 	 * 管理者情報を登録します.
@@ -58,11 +63,14 @@ public class AdministratorService {
 	}
 	
 	/**
-	 * メールアドレスが一致するものをすべて検索.
-	 * @param mailAddress
-	 * @return リストですべて返す
+	 * フォームからドメインにHash化したプロパティ値をコピー
 	 */
-	public List<Administrator> findAll(String mailAddress) {
-		return administratorRepository.findAll(mailAddress);
+	public void passwordHash(InsertAdministratorForm form) {
+		String hashPassword = passwordEncoder.encode(form.getPassword());
+		Administrator administrator = new Administrator();
+		BeanUtils.copyProperties(form, administrator);
+		administrator.setPassword(hashPassword);
+		insert(administrator);
 	}
+	
 }
