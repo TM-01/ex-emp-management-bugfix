@@ -18,7 +18,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         //ログインページを指定。
         //ログインページへのアクセスは全員許可する。
         http.authorizeRequests()
-        	.mvcMatchers("/**", "/employee/**").permitAll()
+        	.mvcMatchers("/**", "/employee/**", "/getAutoComplete/**").permitAll()
         	.and()
         	.formLogin()
             .loginPage("/")
